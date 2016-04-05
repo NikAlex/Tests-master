@@ -1,187 +1,147 @@
-// matrix.cpp: îïðåäåëÿåò òî÷êó âõîäà äëÿ êîíñîëüíîãî ïðèëîæåíèÿ.
-//
-#include "stdafx.h"
-#include "matrix.h"
+#ifndef Matrix_hpp
+#define Matrix_hpp
+
 #include <iostream>
-#include <fstream>
-#include <string>
-//jlksdahgkjhasdkljghlkjasdg
 
-using namespace std;
+class Matrix {
+public:
+	Matrix() : lines(0), columns(0), nom(nullptr) {};
+	Matrix(int _lines, int _columns);
+	Matrix(const Matrix &a);
+	~Matrix();
 
-int min(int a, int b)
-{
-	return a < b ? a : b;
-}
-int max(int a, int b)
-{
-	return a > b ? a : b;
-}
+	void read_matrix(const string s);
+	void print_matrix() const;
+	int get_cout_columns();
+	int get_cout_lines();
+	void reset();
 
-Matrix::Matrix(int rows, int columns) :n(rows), m(columns)
-{
-	matrix = new int*[n];
-	for (int i = 0; i<n; i++)
-	{
-		matrix[i] = new int[m];
-		for (int j = 0; j<m; j++)
-		{
-			matrix[i][j] = 0;
+	Matrix& operator = (Matrix &a);
+	Matrix operator + (Matrix &array) const;
+	Matrix operator * (Matrix &array) const;
+	int* operator [](int i);
+
+private:
+	int lines;
+	int columns;
+	int **nom;
+};
+
+Matrix::~Matrix() {
+	if (nom) {
+		for (int i = 0; i < lines; i++) {
+			delete[] nom[i];
 		}
-	}
-}
-Matrix::Matrix(const Matrix& copy) :n(copy.n), m(copy.m)
-{
-	matrix = new int*[n];
-	for (int i = 0; i<n; i++)
-	{
-		matrix[i] = new int[m];
-		for (int j = 0; j<m; j++)
-		{
-			matrix[i][j] = copy.matrix[i][j];
-		}
-	}
-}
-Matrix::~Matrix()
-{
-	if (matrix != nullptr)
-	{
-		for (int i = 0; i<n; i++)
-		{
-			delete[] matrix[i];
-		}
-		delete[] matrix;
+		delete[] nom;
 	}
 }
 
-Matrix Matrix::operator + (const Matrix &matr)
-{
-	Matrix result(n, m);
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
-		{
-			result.matrix[i][j] = matrix[i][j] + matr.matrix[i][j];
+Matrix::Matrix(const Matrix &copy) : lines(copy.lines), columns(copy.columns) {
+	nom = new int*[lines];
+	for (int i = 0; i < lines; i++) {
+		nom[i] = new int[columns];
+	}
+	for (int i = 0; i < lines; i++) {
+		for (int j = 0; j < columns; j++) {
+			nom[i][j] = copy.nom[i][j];
 		}
 	}
-	return result;
+
 }
-Matrix Matrix::operator - (const Matrix &matr)
-{
-	Matrix result(n, m);
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
-		{
-			result.matrix[i][j] = matrix[i][j] - matr.matrix[i][j];
+
+
+Matrix::Matrix(int _lines, int _columns) : lines(_lines), columns(_columns) {
+	nom = new int*[lines];
+	for (int i = 0; i < lines; i++) {
+		nom[i] = new int[columns];
+	}
+
+}
+
+void Matrix::read_matrix(string s) {
+	ifstream fin(s);
+	for (int i = 0; i < lines; i++) {
+		for (int j = 0; j < columns; j++) {
+			fin >> nom[i][j];
 		}
 	}
-	return result;
+
+	fin.close();
+
 }
-Matrix Matrix::operator * (const Matrix &matr)
-{
-	Matrix result(n, matr.m);
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < matr.m; j++)
-		{
-			int value = 0;
-			for (int k = 0; k < m; k++)
-			{
-				value += matrix[i][k] * matr.matrix[k][j];
-			}
-			result.matrix[i][j] = value;
+void Matrix::print_matrix() const {
+	for (int i = 0; i < lines; i++) {
+
+		for (int j = 0; j < columns; j++) {
+			cout.width(5);
+			cout << nom[i][j] << " ";
 		}
+		cout << endl;
 	}
-	return result;
 }
-Matrix &Matrix::operator = (const Matrix &matr)
-{
-	if (this != &matr)
+Matrix &Matrix::operator = (Matrix &a) {
+	for (int i = 0; i < lines; i++)
+
 	{
-		if (matrix != nullptr)
-		{
-			for (int i = 0; i<n; i++)
-			{
-				delete[] matrix[i];
-			}
-			delete[] matrix;
-		}
-		n = matr.n;
-		m = matr.m;
-		matrix = new int*[n];
-		for (int i = 0; i<n; i++)
-		{
-			matrix[i] = new int[m];
-			for (int j = 0; j<m; j++)
-			{
-				matrix[i][j] = matr.matrix[i][j];
-			}
+		delete[] nom[i];
+	}
+	delete[] nom;
+	lines = a.lines;
+	columns = a.columns;
+	nom = new int*[lines];
+
+	for (int i = 0; i < lines; i++) {
+		nom[i] = new int[columns];
+		for (int j = 0; j < columns; j++) {
+			nom[i][j] = a.nom[i][j];
 		}
 	}
 	return *this;
 }
-bool Matrix::operator == (const Matrix &matr) 
-{
-	if (n!=matr.n || m!=matr.m) 
-	{
-		return false;
-	}
 
-	for (int i = 0; i < n; i++) 
-	{
-		for (int j = 0; j < m; j++) 
-		{
-			if (matrix[i][j] != matr.matrix[i][j]) 
-			{
-				return false;
+
+Matrix Matrix::operator + (Matrix &array) const {
+
+	Matrix result(*this);
+	for (int i = 0; i < result.lines; i++)
+		for (int j = 0; j < result.columns; j++) {
+			result.nom[i][j] += array.nom[i][j];
+		}
+	return result;
+}
+
+Matrix Matrix::operator * (Matrix &array) const {
+
+	Matrix result(lines, array.get_cout_columns());
+	result.reset();
+	for (int i = 0; i < lines; i++)
+		for (int j = 0; j < array.get_cout_lines(); j++)
+			for (int t = 0; t < columns; t++) {
+				result.nom[i][j] += nom[i][t] * array.nom[t][j];
 			}
+	return result;
+}
+
+int* Matrix::operator [] (int i) {
+	int *temp = new int[columns];
+	for (int j = 0; j < columns; j++) {
+		temp[j] = nom[i - 1][j];
+	}
+	return(temp);
+
+}
+int Matrix::get_cout_columns() {
+	return(columns);
+}
+
+int Matrix::get_cout_lines() {
+	return(lines);
+}
+void Matrix::reset() {
+	for (int i = 0; i < lines; i++)
+		for (int j = 0; j < columns; j++) {
+			nom[i][j] = 0;
 		}
-	}
-	return true;
 }
-int* Matrix::operator [] (int index)
-{
-	if (index <= this->n)
-	{
-		return this->matrix[index];
-	}
-	else
-	{
-		return nullptr;
-	}
-}
-int Matrix::Rows() const
-{
-	return n;
-}
-int Matrix::Columns() const
-{
-	return m;
-}
-ostream &operator << (ostream &os, const Matrix &temp)
-{
-	for (int i = 0; i < temp.n; i++)
-	{
-		for (int j = 0; j < temp.m; j++)
-		{
-			os << temp.matrix[i][j] << " ";
-		}
-		os << endl;
-	}
-	return os;
-}
-istream &operator >> (istream &input, Matrix &matr)
-{
-    for (int i = 0; i < matr.n; i++) 
-    {
-        for (int j = 0; j < matr.m; j++) 
-        {
-            if (!(input >> matr.matrix[i][j]))
-            {
-                throw "exception in fill matrix";
-            }
-        }
-    }
-    return input;
-}
+
+#endif
