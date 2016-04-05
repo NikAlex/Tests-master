@@ -1,33 +1,25 @@
-#pragma once
-#ifndef matrix_h
-#define matrix_h
-
-#include <iostream>
-#include <fstream>
-#include <string>
-using namespace std;
-
-class Matrix
-{
+class Matrix {
 public:
-	Matrix() :n(0), m(0), matrix(nullptr) {}
-	Matrix(int rows, int columns);
-	Matrix(const Matrix& copy);
+	Matrix() : lines(0), columns(0), nom(nullptr) {};
+	Matrix(int _lines, int _columns);
+	Matrix(const Matrix &a);
 	~Matrix();
-	Matrix operator + (const Matrix&);
-	Matrix operator - (const Matrix&);
-	Matrix operator * (const Matrix&);
-	Matrix &operator = (const Matrix&);
-	bool operator == (const Matrix&);
-	int* operator [] (int);
-	int Rows() const;
-	int Columns() const;
-	friend ostream &operator << (ostream &cout, const Matrix &temp);
-	friend istream &operator >> (istream &input, Matrix &matr);
+
+	void read_matrix(string s);
+	void print_matrix() const;
+	int get_cout_columns();
+	int get_cout_lines();
+	void reset();
+
+	Matrix& operator = (Matrix &a);
+	Matrix operator + (Matrix &array) const;
+	Matrix operator * (Matrix &array) const;
+	int* operator [](int i);
+
 private:
-	int **matrix;
-	int n;	// ñòðîê
-	int m;	// ñòîëáöîâ
+	int lines;
+	int columns;
+	int **nom;
 };
 
 #endif
