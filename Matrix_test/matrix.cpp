@@ -1,31 +1,13 @@
-#ifndef Matrix_hpp
-#define Matrix_hpp
-
+// matrix.cpp: îïðåäåëÿåò òî÷êó âõîäà äëÿ êîíñîëüíîãî ïðèëîæåíèÿ.
+//
+#include "stdafx.h"
+#include "matrix.h"
 #include <iostream>
+#include <fstream>
+#include <string>
+//jlksdahgkjhasdkljghlkjasdg
 
-class Matrix {
-public:
-	Matrix() : lines(0), columns(0), nom(nullptr) {};
-	Matrix(int _lines, int _columns);
-	Matrix(const Matrix &a);
-	~Matrix();
-
-	void read_matrix(const string s);
-	void print_matrix() const;
-	int get_cout_columns();
-	int get_cout_lines();
-	void reset();
-
-	Matrix& operator = (Matrix &a);
-	Matrix operator + (Matrix &array) const;
-	Matrix operator * (Matrix &array) const;
-	int* operator [](int i);
-
-private:
-	int lines;
-	int columns;
-	int **nom;
-};
+using namespace std;
 
 Matrix::~Matrix() {
 	if (nom) {
@@ -73,7 +55,7 @@ void Matrix::print_matrix() const {
 	for (int i = 0; i < lines; i++) {
 
 		for (int j = 0; j < columns; j++) {
-			cout.width(5);
+			cout.width(2);
 			cout << nom[i][j] << " ";
 		}
 		cout << endl;
@@ -143,5 +125,3 @@ void Matrix::reset() {
 			nom[i][j] = 0;
 		}
 }
-
-#endif
